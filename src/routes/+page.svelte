@@ -1,6 +1,21 @@
-<script>
-	let events = [];
-	let recurringEvents = [];
+<script lang="ts">
+	import { format } from 'date-fns';
+
+	type thing = {
+		time: Date;
+		name: string;
+	};
+
+	type recurringEvent = {
+		alarm?: boolean;
+		name: string;
+		color: string;
+		time: Date;
+		repeat: string;
+	};
+
+	let events: thing[] = [];
+	let recurringEvents: recurringEvent[] = [];
 	let newEvent = '';
 	let selectedTime = '08:00';
 	let selectedColor = '#3b82f6';
@@ -8,23 +23,35 @@
 	let view = 'calendar'; // Switch between "calendar" and "recurring"
 
 	function addEvent() {
+
+
 		if (newEvent.trim() !== '') {
-			events = [...events, { time: selectedTime, text: newEvent }];
+			const [hours, minutes] = selectedTime.split(':');
+			const date = new Date();
+			date.setMinutes(Number(minutes));
+			date.setHours(Number(hours));
+
+			events = [...events, { time: date, name: newEvent }];
 			newEvent = '';
 		}
 	}
 
 	function addRecurringEvent() {
 		if (newEvent.trim() !== '') {
+			const [hours, minutes] = selectedTime.split(':');
+			const date = new Date();
+			date.setMinutes(Number(minutes));
+			date.setHours(Number(hours));
+
 			recurringEvents = [
 				...recurringEvents,
-				{ time: selectedTime, text: newEvent, color: selectedColor, repeat }
+				{ time: date, name: newEvent, color: selectedColor, repeat, alarm: false }
 			];
 			newEvent = '';
 		}
 	}
 
-	function formatTime(hour) {
+	function formatTime(hour: number) {
 		return `${hour.toString().padStart(2, '0')}:00`;
 	}
 
@@ -51,8 +78,8 @@
 					<div class="recurring-bar" style="background: {event.color};"></div>
 				{/each}
 				<div class="event-list">
-					{#each events.filter((e) => e.time === formatTime(i)) as event}
-						<div class="event">{event.text}</div>
+					{#each events.filter((e) => format(e.time, 'HH:mm') === format(new Date().setHours(i, 0), 'HH:mm')) as event}
+						<div class="event">{event.name}</div>
 					{/each}
 				</div>
 			</div>
@@ -61,10 +88,18 @@
 		<div class="input-bar">
 			<input
 				type="text"
-				placeholder="Add an event..."
+				placeholder="Add Something"
 				bind:value={newEvent}
 				on:keydown={(e) => e.key === 'Enter' && addEvent()}
 			/>
+			<div>
+				<input
+					id="appointment-time"
+					type="time"
+					name="appointment-time"
+					bind:value={selectedTime}
+				/>
+			</div>
 
 			<button on:click={addEvent}>+</button>
 		</div>
@@ -187,12 +222,14 @@
 		max-width: 400px;
 	}
 
+	input[type='time'],
 	input[type='text'],
 	select,
 	input[type='color'] {
 		flex: 1;
 		padding: 0.6rem;
 		background: var(--input-bg);
+		margin-left: 0.3rem;
 		border: 1px solid var(--input-border);
 		border-radius: 8px;
 		color: var(--text-color);
