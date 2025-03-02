@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { format } from 'date-fns';
-
 	import CanvasCalendar from './canvascalendar.svelte';
 	import { goto } from '$app/navigation';
+	import { calendarEvents } from './eventStore.svelte';
 
 	type thing = {
 		time: Date;
@@ -17,7 +16,6 @@
 		repeat: string;
 	};
 
-	let events: thing[] = [];
 	let recurringEvents: recurringEvent[] = [];
 	let newEvent = '';
 	let selectedTime = '08:00';
@@ -25,17 +23,6 @@
 	let repeat = 'daily';
 	let view = 'calendar'; // Switch between "calendar" and "recurring"
 
-	function addEvent() {
-		if (newEvent.trim() !== '') {
-			const [hours, minutes] = selectedTime.split(':');
-			const date = new Date();
-			date.setMinutes(Number(minutes));
-			date.setHours(Number(hours));
-
-			events = [...events, { time: date, name: newEvent }];
-			newEvent = '';
-		}
-	}
 
 	function addRecurringEvent() {
 		if (newEvent.trim() !== '') {
@@ -52,13 +39,7 @@
 		}
 	}
 
-	function formatTime(hour: number) {
-		return `${hour.toString().padStart(2, '0')}:00`;
-	}
 
-	function filterRecurringEvents(hour) {
-		return recurringEvents.filter((event) => event.time === formatTime(hour));
-	}
 </script>
 
 <div class="container">

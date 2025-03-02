@@ -1,19 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import type { CalendarEvent, CalendarTask } from '$lib/types/component-types';
+	import { calendarEvents } from './eventStore.svelte';
 
-	type CalendarTask = {
-		pushNotification: boolean;
-		name: string;
-		startTime: Date;
-	};
-
-	type CalendarEvent = {
-		reoccuring: boolean;
-		pushNotification: boolean;
-		name: string;
-		startTime: Date;
-		endTime: Date;
-	};
 
 	let canvas: HTMLCanvasElement | null;
 	let ctx: CanvasRenderingContext2D | null;
@@ -25,9 +14,7 @@
 	const end = new Date();
 	end.setHours(17, 0);
 
-	const events: CalendarEvent[] = [
-		{ reoccuring: false, pushNotification: false, name: 'foo', startTime: start, endTime: end }
-	];
+	const events: CalendarEvent[] = calendarEvents;
 
 	onMount(() => {
 		canvas = document.getElementById('calendarCanvas') as HTMLCanvasElement;
