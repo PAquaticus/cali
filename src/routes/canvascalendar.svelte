@@ -3,10 +3,10 @@
 	import type { CalendarEvent, CalendarTask } from '$lib/types/component-types';
 	import { calendarEvents } from './eventStore.svelte';
 
-
 	let canvas: HTMLCanvasElement | null;
 	let ctx: CanvasRenderingContext2D | null;
 	let scrollContainer: HTMLElement | null;
+	let dpr = 1;
 
 	const start = new Date();
 	start.setHours(16, 0);
@@ -26,6 +26,9 @@
 		if (!ctx) {
 			throw Error('Canvas has no xontext');
 		}
+		dpr = window.devicePixelRatio;
+		ctx.scale(dpr, dpr);
+
 		drawCalendar();
 		canvas.addEventListener('click', handleCanvasClick);
 
@@ -33,6 +36,7 @@
 			throw Error('Scrollcontainer is not ready yet');
 		}
 		scrollContainer.scrollTop = 300;
+
 		// Set the scroll position
 	});
 
@@ -42,8 +46,8 @@
 
 	function resizeCanvas() {
 		if (canvas) {
-			canvas.width = canvas.offsetWidth;
-			canvas.height = canvas.offsetHeight;
+			canvas.width = canvas.offsetWidth * dpr;
+			canvas.height = canvas.offsetHeight * dpr;
 			drawCalendar();
 		}
 	}
@@ -52,11 +56,13 @@
 		if (!canvas || !ctx) {
 			throw 'initialization error = canvas or ctx not present during draw';
 		}
+
 		const currentCanvas = canvas;
 		const currentCtx = ctx;
 
 		const startHour = 0;
 		const endHour = 24;
+        console.log(currentCanvas.height)
 		const cellHeight = currentCanvas.height / endHour;
 		const cellWidth = currentCanvas.width;
 		const numHours = endHour - startHour;
@@ -76,9 +82,9 @@
 
 			// Draw hour labels
 			currentCtx.fillStyle = '#fff';
-			currentCtx.font = '14px Arial';
+			currentCtx.font = '2rem Arial';
 			currentCtx.textAlign = 'left';
-			currentCtx.fillText(`${hour.toString().padStart(2, '0')}:00`, 10, y + 15);
+			currentCtx.fillText(`${hour.toString().padStart(2, '0')}:00`, 10, y + 35);
 		}
 
 		// Draw events
@@ -89,11 +95,11 @@
 			const height = (duration / 60) * cellHeight;
 
 			currentCtx.fillStyle = '#ff6347'; // Tomato color for events
-			currentCtx.fillRect(60, startY + 5, cellWidth - 70, height - 10);
+			currentCtx.fillRect(100, startY + 5, cellWidth - 70, height - 10);
 
 			currentCtx.fillStyle = '#000';
 			currentCtx.textAlign = 'left';
-			currentCtx.fillText(event.name, 70, startY + height / 2 + 5);
+			currentCtx.fillText(event.name, 130, startY + height / 2 + 5);
 
 			// Store event details for click detection
 			event.x = 60;
@@ -125,22 +131,21 @@
 </script>
 
 <div bind:this={scrollContainer} class="scrollable-container">
-	<canvas id="calendarCanvas"></canvas>
+	<canvas style="width: 100%; height: 100%; max-width: 100%; max-height: 100%;" id="calendarCanvas"
+	></canvas>
 </div>
 
 <style>
 	canvas {
 		width: 100%;
 		height: 1200px;
+		background-color: #1e1e1e; /* Set canvas background color to black */
 	}
 
 	.scrollable-container {
 		width: 100%;
-		height: 100%;
+		height: 1200px;
 		background-color: #1e1e1e; /* Set background color to black */
 	}
 
-	canvas {
-		background-color: #1e1e1e; /* Set canvas background color to black */
-	}
 </style>
