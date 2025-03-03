@@ -1,88 +1,23 @@
 <script lang="ts">
 	import CanvasCalendar from './canvascalendar.svelte';
 	import { goto } from '$app/navigation';
-	import { calendarEvents } from './eventStore.svelte';
-
-	type thing = {
-		time: Date;
-		name: string;
-	};
-
-	type recurringEvent = {
-		alarm?: boolean;
-		name: string;
-		color: string;
-		time: Date;
-		repeat: string;
-	};
-
-	let recurringEvents: recurringEvent[] = [];
-	let newEvent = '';
-	let selectedTime = '08:00';
-	let selectedColor = '#3b82f6';
-	let repeat = 'daily';
-	let view = 'calendar'; // Switch between "calendar" and "recurring"
-
-
-	function addRecurringEvent() {
-		if (newEvent.trim() !== '') {
-			const [hours, minutes] = selectedTime.split(':');
-			const date = new Date();
-			date.setMinutes(Number(minutes));
-			date.setHours(Number(hours));
-
-			recurringEvents = [
-				...recurringEvents,
-				{ time: date, name: newEvent, color: selectedColor, repeat, alarm: false }
-			];
-			newEvent = '';
-		}
-	}
-
-
 </script>
 
 <div class="container">
 	<div class="switch">
-		<button on:click={() => (view = 'calendar')} class:active={view === 'calendar'}
-			>Daily View</button
-		>
-		<button on:click={() => (view = 'recurring')} class:active={view === 'recurring'}
-			>Recurring Events</button
-		>
+		<button class:active={true}>Daily View</button>
+		<button on:click={() => goto('reocurring-events')}>Recurring</button>
+		<button on:click={() => goto('settings')}>Settings</button>
 	</div>
 
-	{#if view === 'calendar'}
-		<CanvasCalendar />
-		<div class="input-bar">
-			<button on:click={() => goto("create-event")}>✓</button>
-			<button on:click={() => goto("create-event")}>+</button>
-		</div>
-	{:else}
-		<h3>Recurring Events</h3>
-		<div class="recurring-list">
-			{#each recurringEvents as event}
-				<div class="recurring-item">
-					<span>{event.text} ({event.repeat} at {event.time})</span>
-					<div class="color-preview" style="background: {event.color};"></div>
-				</div>
-			{/each}
-		</div>
-
-		<div class="input-bar">
-			<input type="text" placeholder="Recurring event..." bind:value={newEvent} />
-			<select bind:value={repeat}>
-				<option value="daily">Daily</option>
-				<option value="weekly">Weekly</option>
-			</select>
-			<input type="color" bind:value={selectedColor} />
-			<button on:click={addRecurringEvent}>+</button>
-		</div>
-	{/if}
+	<CanvasCalendar />
+	<div class="input-bar">
+		<button on:click={() => goto('create-event')}>✓</button>
+		<button on:click={() => goto('create-event')}>+</button>
+	</div>
 </div>
 
 <style>
-
 	.container {
 		position: fixed;
 		top: 0;
@@ -121,8 +56,8 @@
 		position: fixed;
 		bottom: 1rem;
 		display: flex;
-        padding-right: 2rem;
-        justify-content: flex-end;
+		padding-right: 2rem;
+		justify-content: flex-end;
 		align-items: center;
 		width: 100%;
 	}
@@ -143,23 +78,4 @@
 		background: var(--hover-blue);
 	}
 
-	.recurring-list {
-		display: flex;
-		flex-direction: column;
-		gap: 0.8rem;
-	}
-
-	.recurring-item {
-		background: var(--card-bg);
-		padding: 0.8rem;
-		border-radius: 8px;
-		display: flex;
-		justify-content: space-between;
-	}
-
-	.color-preview {
-		width: 20px;
-		height: 20px;
-		border-radius: 50%;
-	}
 </style>

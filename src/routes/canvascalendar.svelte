@@ -62,7 +62,6 @@
 
 		const startHour = 0;
 		const endHour = 24;
-        console.log(currentCanvas.height)
 		const cellHeight = currentCanvas.height / endHour;
 		const cellWidth = currentCanvas.width;
 		const numHours = endHour - startHour;
